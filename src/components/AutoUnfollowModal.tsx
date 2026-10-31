@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, Copy, Check, ExternalLink, ShieldAlert, Sparkles, Sliders, Play, Code } from 'lucide-react';
+import { X, Copy, Check, ExternalLink, ShieldAlert, Sliders, Play, Code } from 'lucide-react';
 import { generateUnfollowScript, generateBookmarkletUrl } from '@/utils/unfollowScript';
 
 interface AutoUnfollowModalProps {
@@ -20,7 +20,7 @@ export const AutoUnfollowModal: React.FC<AutoUnfollowModalProps> = ({
   const [delaySeconds, setDelaySeconds] = useState(8);
   const [copiedScript, setCopiedScript] = useState(false);
   const [copiedList, setCopiedList] = useState(false);
-  const [activeTab, setActiveTab] = useState<'bookmarklet' | 'console' | 'manual'>('bookmarklet');
+  const [activeTab, setActiveTab] = useState<'console' | 'bookmarklet' | 'manual'>('console');
 
   if (!isOpen) return null;
 
@@ -40,50 +40,47 @@ export const AutoUnfollowModal: React.FC<AutoUnfollowModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-in fade-in duration-150">
+      <div className="bg-white border border-slate-200 rounded-2xl max-w-xl w-full max-h-[90vh] flex flex-col shadow-xl overflow-hidden">
         {/* Header */}
-        <div className="p-5 border-b border-zinc-800 flex items-center justify-between bg-zinc-950/50">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-rose-500 to-purple-600 flex items-center justify-center text-white shadow-md">
-              <Sparkles className="w-4 h-4" />
-            </div>
-            <div>
-              <h3 className="font-bold text-white text-base">Smart In-Browser Auto-Unfollower</h3>
-              <p className="text-xs text-zinc-400">
-                {selectedUsernames.length} akun siap diproses langsung di browser Anda secara aman
-              </p>
-            </div>
+        <div className="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
+          <div>
+            <h3 className="font-semibold text-slate-900 text-sm">
+              Mulai Unfollow ({selectedUsernames.length} Akun Dipilih)
+            </h3>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Diproses langsung dari tab Instagram Anda dengan jeda aman.
+            </p>
           </div>
           <button
             onClick={onClose}
-            className="text-zinc-400 hover:text-white p-1 rounded-lg hover:bg-zinc-800 transition-colors"
+            className="text-slate-400 hover:text-slate-700 p-1 rounded-md hover:bg-slate-100 transition-colors cursor-pointer"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Modal Body */}
-        <div className="p-6 overflow-y-auto space-y-6 text-sm">
+        <div className="p-5 overflow-y-auto space-y-4 text-xs">
           {/* Large Batch Warning */}
           {selectedUsernames.length > 50 && (
-            <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-start gap-2.5">
-              <ShieldAlert className="w-5 h-5 mt-0.5 shrink-0 text-rose-400" />
+            <div className="p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 flex items-start gap-2.5">
+              <ShieldAlert className="w-4 h-4 mt-0.5 shrink-0 text-amber-600" />
               <div>
-                <strong>Peringatan Batch Besar ({selectedUsernames.length} Akun):</strong> Instagram memiliki sistem anti-spam yang ketat dan akan membatasi request (error 429 Too Many Requests) jika memproses lebih dari 50–100 akun sekaligus dalam satu sesi. Sangat disarankan unfollow bertahap (gunakan tombol <strong>Pilih 25</strong> atau <strong>Pilih 50</strong>) dengan jeda 1–2 jam per sesi agar terhindar dari limit!
+                <strong>Perhatian ({selectedUsernames.length} akun):</strong> Instagram membatasi aktivitas jika melakukan lebih dari 50 akun sekaligus (error 429). Sangat disarankan cicil <strong>25–50 akun per sesi</strong> lalu beri jeda 1 jam.
               </div>
             </div>
           )}
 
-          {/* Safety Delay Slider */}
-          <div className="p-4 rounded-xl bg-zinc-950/80 border border-zinc-800 space-y-3">
+          {/* Delay Slider */}
+          <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Sliders className="w-4 h-4 text-purple-400" />
-                <span className="font-medium text-white text-xs">Jeda Keamanan Antar Unfollow:</span>
+              <div className="flex items-center gap-1.5 text-slate-700 font-medium">
+                <Sliders className="w-3.5 h-3.5 text-slate-500" />
+                <span>Jeda antar unfollow:</span>
               </div>
-              <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20">
-                {delaySeconds} Detik (+ acak 1-4s)
+              <span className="font-semibold text-slate-900 bg-white px-2 py-0.5 rounded border border-slate-200">
+                {delaySeconds} detik (+ acak 1-4s)
               </span>
             </div>
 
@@ -94,157 +91,150 @@ export const AutoUnfollowModal: React.FC<AutoUnfollowModalProps> = ({
               step={1}
               value={delaySeconds}
               onChange={(e) => setDelaySeconds(Number(e.target.value))}
-              className="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-purple-500"
+              className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-slate-900"
             />
 
-            <div className="flex justify-between text-[11px] text-zinc-500">
+            <div className="flex justify-between text-[11px] text-slate-400">
               <span>5s (Cepat)</span>
-              <span className="text-emerald-400 font-medium">8s - 12s (Rekomendasi Aman)</span>
+              <span className="text-emerald-700 font-medium">8s - 12s (Disarankan)</span>
               <span>20s (Sangat Aman)</span>
             </div>
           </div>
 
-          {/* Execution Tabs */}
+          {/* Tabs */}
           <div>
-            <div className="flex border-b border-zinc-800 mb-4">
+            <div className="flex border-b border-slate-200 mb-3">
               <button
-                onClick={() => setActiveTab('bookmarklet')}
-                className={`flex items-center gap-2 pb-2.5 px-3 text-xs font-medium border-b-2 transition-all ${
-                  activeTab === 'bookmarklet'
-                    ? 'border-rose-500 text-white'
-                    : 'border-transparent text-zinc-400 hover:text-zinc-300'
+                onClick={() => setActiveTab('console')}
+                className={`flex items-center gap-1.5 pb-2 px-3 text-xs font-medium border-b-2 transition-colors cursor-pointer ${
+                  activeTab === 'console'
+                    ? 'border-slate-900 text-slate-900 font-semibold'
+                    : 'border-transparent text-slate-500 hover:text-slate-800'
                 }`}
               >
-                <Play className="w-3.5 h-3.5 text-rose-400" />
-                <span>Metode 1: Bookmarklet (Praktis)</span>
+                <Code className="w-3.5 h-3.5" />
+                <span>Cara 1: Console Script (Paling Pasti)</span>
               </button>
 
               <button
-                onClick={() => setActiveTab('console')}
-                className={`flex items-center gap-2 pb-2.5 px-3 text-xs font-medium border-b-2 transition-all ${
-                  activeTab === 'console'
-                    ? 'border-purple-500 text-white'
-                    : 'border-transparent text-zinc-400 hover:text-zinc-300'
+                onClick={() => setActiveTab('bookmarklet')}
+                className={`flex items-center gap-1.5 pb-2 px-3 text-xs font-medium border-b-2 transition-colors cursor-pointer ${
+                  activeTab === 'bookmarklet'
+                    ? 'border-slate-900 text-slate-900 font-semibold'
+                    : 'border-transparent text-slate-500 hover:text-slate-800'
                 }`}
               >
-                <Code className="w-3.5 h-3.5 text-purple-400" />
-                <span>Metode 2: Console Script (F12)</span>
+                <Play className="w-3.5 h-3.5" />
+                <span>Cara 2: Bookmarklet</span>
               </button>
 
               <button
                 onClick={() => setActiveTab('manual')}
-                className={`flex items-center gap-2 pb-2.5 px-3 text-xs font-medium border-b-2 transition-all ${
+                className={`flex items-center gap-1.5 pb-2 px-3 text-xs font-medium border-b-2 transition-colors cursor-pointer ${
                   activeTab === 'manual'
-                    ? 'border-blue-500 text-white'
-                    : 'border-transparent text-zinc-400 hover:text-zinc-300'
+                    ? 'border-slate-900 text-slate-900 font-semibold'
+                    : 'border-transparent text-slate-500 hover:text-slate-800'
                 }`}
               >
-                <ExternalLink className="w-3.5 h-3.5 text-blue-400" />
-                <span>Metode 3: Buka Link Manual</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+                <span>Cara 3: Manual</span>
               </button>
             </div>
 
-            {/* TAB 1: Bookmarklet */}
-            {activeTab === 'bookmarklet' && (
-              <div className="space-y-4">
-                <div className="p-4 rounded-xl bg-gradient-to-br from-rose-500/10 via-purple-500/5 to-transparent border border-rose-500/20 text-center">
-                  <p className="text-xs text-zinc-300 mb-3">
-                    Seret tombol di bawah ini ke <strong>Bookmarks Bar (Bilah Bookmark)</strong> browser Anda:
-                  </p>
-
-                  <a
-                    href={bookmarkletUrl}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      alert('Jangan diklik di sini! Seret (drag & drop) tombol ini ke Bilah Bookmark browser Anda, atau gunakan Tab "Console Script" untuk copy-paste.');
-                    }}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-purple-600 hover:from-rose-500 hover:to-purple-500 text-white font-bold text-xs shadow-lg shadow-rose-600/20 cursor-grab active:cursor-grabbing border border-rose-400/30"
-                  >
-                    <span>⚡ Auto Unfollow ({selectedUsernames.length} Akun)</span>
-                  </a>
-
-                  <p className="text-[11px] text-zinc-500 mt-3">
-                    (Jika bookmark bar belum muncul di Chrome/Edge, tekan <kbd className="px-1.5 py-0.5 bg-zinc-800 rounded text-zinc-300">Ctrl + Shift + B</kbd>)
-                  </p>
-                </div>
-
-                <ol className="text-xs text-zinc-300 space-y-2 list-decimal list-inside bg-zinc-950 p-4 rounded-xl border border-zinc-800">
-                  <li>Seret tombol di atas ke bilah bookmark Anda.</li>
-                  <li>Buka tab <a href="https://www.instagram.com" target="_blank" rel="noreferrer" className="text-rose-400 underline">instagram.com</a> (pastikan sudah login).</li>
-                  <li>Klik bookmark yang baru saja Anda tambahkan.</li>
-                  <li>Widget mini akan muncul di pojok kanan bawah Instagram Anda untuk memproses unfollow dengan jeda waktu otomatis!</li>
-                </ol>
-              </div>
-            )}
-
-            {/* TAB 2: Console Script */}
+            {/* TAB 1: Console */}
             {activeTab === 'console' && (
               <div className="space-y-3">
-                <p className="text-xs text-zinc-400">
-                  Salin script di bawah ini, lalu jalankan di tab <code className="text-rose-400">instagram.com</code> melalui tab Console (F12).
-                </p>
-
                 <div className="relative">
-                  <pre className="bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-[11px] text-zinc-300 font-mono max-h-36 overflow-y-auto">
+                  <pre className="bg-slate-900 text-slate-100 rounded-xl p-3 text-[11px] font-mono max-h-32 overflow-y-auto">
                     {script}
                   </pre>
                   <button
                     onClick={handleCopyScript}
-                    className="absolute top-2 right-2 px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-semibold flex items-center gap-1.5 shadow"
+                    className="absolute top-2 right-2 px-2.5 py-1 rounded bg-white/20 hover:bg-white/30 text-white font-medium text-xs flex items-center gap-1 transition-colors cursor-pointer"
                   >
                     {copiedScript ? (
                       <>
-                        <Check className="w-3.5 h-3.5 text-emerald-400" />
+                        <Check className="w-3 h-3 text-emerald-400" />
                         <span>Tersalin!</span>
                       </>
                     ) : (
                       <>
-                        <Copy className="w-3.5 h-3.5" />
+                        <Copy className="w-3 h-3" />
                         <span>Salin Script</span>
                       </>
                     )}
                   </button>
                 </div>
 
-                <div className="bg-zinc-950 p-3.5 rounded-xl border border-zinc-800 text-xs text-zinc-300 space-y-1.5">
-                  <div className="font-semibold text-white">Cara Jalankan di Browser:</div>
-                  <p>1. Buka <a href="https://www.instagram.com" target="_blank" rel="noreferrer" className="text-rose-400 underline font-medium">instagram.com</a>.</p>
-                  <p>2. Tekan <kbd className="px-1.5 py-0.5 bg-zinc-800 rounded text-zinc-300">F12</kbd> di keyboard (atau klik kanan &rarr; Inspect).</p>
-                  <p>3. Klik tab <strong>Console</strong>, lalu tempel (Paste) script tadi dan tekan <strong>Enter</strong>.</p>
+                <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200 text-slate-700 space-y-1.5">
+                  <div className="font-semibold text-slate-900">Cara Menjalankan:</div>
+                  <p>1. Buka tab <a href="https://www.instagram.com" target="_blank" rel="noreferrer" className="text-slate-900 underline font-medium">instagram.com</a> tempat Anda sudah login.</p>
+                  <p>2. Tekan <kbd className="px-1.5 py-0.5 bg-slate-200 rounded text-slate-800 font-mono">F12</kbd> di keyboard &rarr; klik tab <strong>Console</strong>.</p>
+                  <p>3. Jika muncul larangan paste, ketik <code className="bg-slate-200 px-1 rounded font-mono text-slate-900">allow pasting</code> lalu tekan Enter.</p>
+                  <p>4. Tekan <kbd className="px-1.5 py-0.5 bg-slate-200 rounded text-slate-800 font-mono">Ctrl + V</kbd> (Paste) dan tekan <strong>Enter</strong>.</p>
                 </div>
               </div>
             )}
 
-            {/* TAB 3: Manual Links */}
-            {activeTab === 'manual' && (
+            {/* TAB 2: Bookmarklet */}
+            {activeTab === 'bookmarklet' && (
               <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <p className="text-xs text-zinc-400">
-                    Buka profil target secara berurutan untuk unfollow manual dalam 1-klik:
+                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-center">
+                  <p className="text-xs text-slate-600 mb-3">
+                    Seret (drag & drop) tombol di bawah ini ke <strong>Bilah Bookmark (Bookmarks Bar)</strong>:
                   </p>
+
+                  <a
+                    href={bookmarkletUrl}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      alert('Jangan klik di sini. Seret tombol ini ke Bilah Bookmark browser Anda!');
+                    }}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-slate-900 hover:bg-black text-white font-semibold text-xs cursor-grab active:cursor-grabbing shadow-xs"
+                  >
+                    <Play className="w-3.5 h-3.5 fill-white" />
+                    <span>Auto Unfollow ({selectedUsernames.length})</span>
+                  </a>
+
+                  <p className="text-[11px] text-slate-400 mt-2">
+                    Buka Bilah Bookmark di Chrome: tekan <kbd className="px-1 py-0.5 bg-slate-200 rounded text-slate-700">Ctrl + Shift + B</kbd>
+                  </p>
+                </div>
+
+                <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 text-slate-600 space-y-1">
+                  <p>Setelah bookmark disimpan, buka tab <code className="text-slate-900">instagram.com</code> dan cukup klik bookmark tersebut.</p>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 3: Manual */}
+            {activeTab === 'manual' && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-600">Buka profil langsung satu per satu:</span>
                   <button
                     onClick={handleCopyList}
-                    className="text-xs text-rose-400 hover:text-rose-300 flex items-center gap-1"
+                    className="text-slate-700 hover:text-slate-900 font-medium flex items-center gap-1 cursor-pointer"
                   >
-                    {copiedList ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                    {copiedList ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
                     <span>{copiedList ? 'Tersalin' : 'Salin Semua Username'}</span>
                   </button>
                 </div>
 
-                <div className="max-h-48 overflow-y-auto space-y-1.5 pr-1">
+                <div className="max-h-40 overflow-y-auto space-y-1 pr-1">
                   {selectedUsernames.map((username) => (
                     <div
                       key={username}
-                      className="flex items-center justify-between p-2 rounded-lg bg-zinc-950 border border-zinc-800/80 text-xs"
+                      className="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-200"
                     >
-                      <span className="font-medium text-zinc-200">@{username}</span>
+                      <span className="font-medium text-slate-800">@{username}</span>
                       <a
                         href={`https://www.instagram.com/${username}`}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white"
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white border border-slate-200 text-slate-700 hover:text-slate-900"
                       >
-                        <span>Buka Profil</span>
+                        <span>Buka</span>
                         <ExternalLink className="w-3 h-3" />
                       </a>
                     </div>
@@ -253,32 +243,25 @@ export const AutoUnfollowModal: React.FC<AutoUnfollowModalProps> = ({
               </div>
             )}
           </div>
-
-          {/* Safety Notice */}
-          <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs flex items-start gap-2.5">
-            <ShieldAlert className="w-4 h-4 mt-0.5 shrink-0" />
-            <div>
-              <strong>Batas Aman Instagram:</strong> Disarankan unfollow maksimal <strong>30-50 akun per sesi</strong>. Beri jeda 1-2 jam sebelum melakukan batch berikutnya untuk menjaga reputasi akun Anda dari sistem bot detection Instagram.
-            </div>
-          </div>
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-zinc-800 bg-zinc-950/80 flex justify-between items-center">
+        <div className="px-5 py-3 border-t border-slate-200 bg-slate-50 flex items-center justify-between">
           {onMarkUnfollowed && (
             <button
               onClick={() => {
                 onMarkUnfollowed(selectedUsernames);
                 onClose();
               }}
-              className="text-xs text-zinc-400 hover:text-emerald-400 font-medium"
+              className="text-xs text-slate-600 hover:text-slate-900 font-medium cursor-pointer"
             >
-              ✓ Tandai Akun Ini Sebagai Selesai
+              Tandai akun ini sudah selesai
             </button>
           )}
+
           <button
             onClick={onClose}
-            className="px-5 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl text-xs font-semibold transition-all ml-auto"
+            className="px-4 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-medium transition-colors cursor-pointer ml-auto"
           >
             Tutup
           </button>
@@ -287,4 +270,3 @@ export const AutoUnfollowModal: React.FC<AutoUnfollowModalProps> = ({
     </div>
   );
 };
-

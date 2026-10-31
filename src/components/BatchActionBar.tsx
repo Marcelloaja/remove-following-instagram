@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Sparkles, Copy, X, CheckSquare } from 'lucide-react';
+import { Copy, X, ArrowRight, Play } from 'lucide-react';
 
 interface BatchActionBarProps {
   selectedCount: number;
@@ -14,7 +14,6 @@ interface BatchActionBarProps {
 
 export const BatchActionBar: React.FC<BatchActionBarProps> = ({
   selectedCount,
-  totalVisible,
   onOpenAutoUnfollow,
   onClearSelection,
   onCopySelected,
@@ -23,68 +22,66 @@ export const BatchActionBar: React.FC<BatchActionBarProps> = ({
   if (selectedCount === 0) return null;
 
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 w-[94%] max-w-2xl animate-in slide-in-from-bottom-5 duration-300">
-      <div className="bg-zinc-900/95 backdrop-blur-xl border border-zinc-700/80 rounded-2xl p-3 sm:p-4 shadow-2xl shadow-black/80 flex flex-col sm:flex-row items-center justify-between gap-3">
-        {/* Left: Info & Quick selector */}
-        <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 w-[92%] max-w-xl animate-in slide-in-from-bottom-3 duration-200">
+      <div className="bg-slate-900 text-white rounded-2xl px-4 py-3 shadow-xl flex items-center justify-between gap-3">
+        {/* Left: Selected count & Quick pick */}
+        <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <span className="w-6 h-6 rounded-lg bg-rose-500/20 text-rose-400 font-bold text-xs flex items-center justify-center">
+            <span className="w-6 h-6 rounded-md bg-white/10 text-white font-bold text-xs flex items-center justify-center">
               {selectedCount}
             </span>
-            <span className="text-xs font-semibold text-white">Akun Dipilih</span>
+            <span className="text-xs font-medium text-slate-200">Terpilih</span>
           </div>
 
-          <div className="flex items-center gap-1.5">
+          <div className="hidden sm:flex items-center gap-1 border-l border-white/15 pl-3">
             <button
               onClick={() => onSelectQuick(10)}
-              className="px-2 py-1 text-[11px] font-medium bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-lg transition-colors"
+              className="px-2 py-0.5 text-[11px] font-medium bg-white/10 hover:bg-white/20 text-slate-200 rounded transition-colors cursor-pointer"
             >
               +10
             </button>
             <button
               onClick={() => onSelectQuick(25)}
-              className="px-2 py-1 text-[11px] font-medium bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-lg transition-colors"
+              className="px-2 py-0.5 text-[11px] font-medium bg-white/10 hover:bg-white/20 text-slate-200 rounded transition-colors cursor-pointer"
             >
               +25
             </button>
             <button
               onClick={() => onSelectQuick(50)}
-              className="px-2 py-1 text-[11px] font-medium bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-lg transition-colors"
+              className="px-2 py-0.5 text-[11px] font-medium bg-white/10 hover:bg-white/20 text-slate-200 rounded transition-colors cursor-pointer"
             >
               +50
             </button>
           </div>
         </div>
 
-        {/* Right Actions */}
-        <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+        {/* Right: Actions */}
+        <div className="flex items-center gap-2">
           <button
             onClick={onCopySelected}
-            className="flex items-center gap-1.5 px-3 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded-xl text-xs font-medium transition-all"
+            className="p-1.5 text-slate-300 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
             title="Salin daftar username"
           >
-            <Copy className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Salin</span>
+            <Copy className="w-4 h-4" />
           </button>
 
           <button
             onClick={onClearSelection}
-            className="p-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white rounded-xl transition-all"
-            title="Batal Pilih"
+            className="p-1.5 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
+            title="Batal pilih semua"
           >
             <X className="w-4 h-4" />
           </button>
 
           <button
             onClick={onOpenAutoUnfollow}
-            className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 via-rose-500 to-purple-600 hover:from-rose-500 hover:to-purple-500 text-white font-bold text-xs shadow-lg shadow-rose-600/30 transition-all active:scale-95"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-white text-slate-900 hover:bg-slate-100 font-semibold text-xs transition-colors cursor-pointer shadow-xs ml-1"
           >
-            <Sparkles className="w-4 h-4" />
-            <span>⚡ Jalankan Auto-Unfollow</span>
+            <Play className="w-3.5 h-3.5 fill-slate-900" />
+            <span>Mulai Unfollow</span>
           </button>
         </div>
       </div>
     </div>
   );
 };
-

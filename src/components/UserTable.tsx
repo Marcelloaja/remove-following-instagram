@@ -3,7 +3,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import {
   Search,
-  ArrowUpDown,
   UserX,
   Users,
   HeartHandshake,
@@ -13,7 +12,6 @@ import {
   Check,
   CheckSquare,
   Square,
-  Sparkles,
   Download,
 } from 'lucide-react';
 import { InstagramUser, ParseResult, TabType } from '@/types/instagram';
@@ -39,7 +37,6 @@ export const UserTable: React.FC<UserTableProps> = ({
   const [pageSize, setPageSize] = useState(50);
   const [unfollowedLocally, setUnfollowedLocally] = useState<Set<string>>(new Set());
 
-  // Load Whitelist from localStorage on mount
   useEffect(() => {
     try {
       const saved = localStorage.getItem('ig_unfoll_whitelist');
@@ -58,7 +55,6 @@ export const UserTable: React.FC<UserTableProps> = ({
         next.delete(username);
       } else {
         next.add(username);
-        // Also deselect if whitelisted
         setSelectedUsernames((curr) => curr.filter((u) => u !== username));
       }
       try {
@@ -79,7 +75,6 @@ export const UserTable: React.FC<UserTableProps> = ({
     setSelectedUsernames((curr) => curr.filter((u) => u !== username));
   };
 
-  // Base list depending on active tab
   const rawList = useMemo(() => {
     switch (activeTab) {
       case 'notFollowingBack':
@@ -95,7 +90,6 @@ export const UserTable: React.FC<UserTableProps> = ({
     }
   }, [activeTab, data, unfollowedLocally, whitelist]);
 
-  // Filter and sort
   const filteredList = useMemo(() => {
     let list = rawList;
 
@@ -129,7 +123,6 @@ export const UserTable: React.FC<UserTableProps> = ({
     return filteredList.slice(0, pageSize);
   }, [filteredList, pageSize]);
 
-  // Selection handlers
   const handleToggleSelect = (username: string) => {
     setSelectedUsernames((prev) =>
       prev.includes(username) ? prev.filter((u) => u !== username) : [...prev, username]
@@ -169,43 +162,29 @@ export const UserTable: React.FC<UserTableProps> = ({
     document.body.removeChild(link);
   };
 
-  // Helper avatar background colors based on username string
-  const getAvatarGradient = (str: string) => {
-    const gradients = [
-      'from-rose-500 to-amber-500',
-      'from-purple-600 to-indigo-600',
-      'from-pink-500 to-rose-600',
-      'from-cyan-500 to-blue-600',
-      'from-emerald-500 to-teal-600',
-    ];
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) hash += str.charCodeAt(i);
-    return gradients[Math.abs(hash) % gradients.length];
-  };
-
   return (
     <div className="space-y-6">
-      {/* Top Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+      {/* Metric Tabs */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <button
           onClick={() => {
             setActiveTab('notFollowingBack');
             setSelectedUsernames([]);
           }}
-          className={`p-4 rounded-2xl border text-left transition-all ${
+          className={`p-4 rounded-xl border text-left transition-all cursor-pointer ${
             activeTab === 'notFollowingBack'
-              ? 'bg-rose-500/10 border-rose-500/40 shadow-lg shadow-rose-500/10'
-              : 'bg-zinc-900/40 border-zinc-800 hover:border-zinc-700'
+              ? 'bg-white border-slate-900 shadow-xs ring-1 ring-slate-900'
+              : 'bg-white border-slate-200 hover:border-slate-300'
           }`}
         >
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-semibold text-rose-400">Tidak Follback Kamu</span>
-            <UserX className="w-4 h-4 text-rose-400" />
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-xs font-medium text-slate-600">Tidak Follback Kamu</span>
+            <UserX className="w-4 h-4 text-red-500" />
           </div>
-          <div className="text-2xl font-bold text-white tracking-tight">
+          <div className="text-2xl font-bold text-slate-900">
             {data.notFollowingBack.length - unfollowedLocally.size}
           </div>
-          <p className="text-[11px] text-zinc-400 mt-1">Akun yang Anda ikuti tapi tidak follback</p>
+          <p className="text-[11px] text-slate-500 mt-1">Anda follow, mereka tidak</p>
         </button>
 
         <button
@@ -213,18 +192,18 @@ export const UserTable: React.FC<UserTableProps> = ({
             setActiveTab('fans');
             setSelectedUsernames([]);
           }}
-          className={`p-4 rounded-2xl border text-left transition-all ${
+          className={`p-4 rounded-xl border text-left transition-all cursor-pointer ${
             activeTab === 'fans'
-              ? 'bg-purple-500/10 border-purple-500/40 shadow-lg shadow-purple-500/10'
-              : 'bg-zinc-900/40 border-zinc-800 hover:border-zinc-700'
+              ? 'bg-white border-slate-900 shadow-xs ring-1 ring-slate-900'
+              : 'bg-white border-slate-200 hover:border-slate-300'
           }`}
         >
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-semibold text-purple-400">Fans (Followers Saja)</span>
-            <Users className="w-4 h-4 text-purple-400" />
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-xs font-medium text-slate-600">Fans (Followers Saja)</span>
+            <Users className="w-4 h-4 text-slate-500" />
           </div>
-          <div className="text-2xl font-bold text-white tracking-tight">{data.fans.length}</div>
-          <p className="text-[11px] text-zinc-400 mt-1">Mereka follow Anda, Anda belum follow</p>
+          <div className="text-2xl font-bold text-slate-900">{data.fans.length}</div>
+          <p className="text-[11px] text-slate-500 mt-1">Mereka follow, Anda belum</p>
         </button>
 
         <button
@@ -232,18 +211,18 @@ export const UserTable: React.FC<UserTableProps> = ({
             setActiveTab('mutuals');
             setSelectedUsernames([]);
           }}
-          className={`p-4 rounded-2xl border text-left transition-all ${
+          className={`p-4 rounded-xl border text-left transition-all cursor-pointer ${
             activeTab === 'mutuals'
-              ? 'bg-emerald-500/10 border-emerald-500/40 shadow-lg shadow-emerald-500/10'
-              : 'bg-zinc-900/40 border-zinc-800 hover:border-zinc-700'
+              ? 'bg-white border-slate-900 shadow-xs ring-1 ring-slate-900'
+              : 'bg-white border-slate-200 hover:border-slate-300'
           }`}
         >
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-semibold text-emerald-400">Saling Follow (Mutuals)</span>
-            <HeartHandshake className="w-4 h-4 text-emerald-400" />
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-xs font-medium text-slate-600">Saling Follow (Mutuals)</span>
+            <HeartHandshake className="w-4 h-4 text-emerald-600" />
           </div>
-          <div className="text-2xl font-bold text-white tracking-tight">{data.mutuals.length}</div>
-          <p className="text-[11px] text-zinc-400 mt-1">Teman yang saling mengikuti</p>
+          <div className="text-2xl font-bold text-slate-900">{data.mutuals.length}</div>
+          <p className="text-[11px] text-slate-500 mt-1">Saling mengikuti</p>
         </button>
 
         <button
@@ -251,108 +230,102 @@ export const UserTable: React.FC<UserTableProps> = ({
             setActiveTab('whitelist');
             setSelectedUsernames([]);
           }}
-          className={`p-4 rounded-2xl border text-left transition-all ${
+          className={`p-4 rounded-xl border text-left transition-all cursor-pointer ${
             activeTab === 'whitelist'
-              ? 'bg-amber-500/10 border-amber-500/40 shadow-lg shadow-amber-500/10'
-              : 'bg-zinc-900/40 border-zinc-800 hover:border-zinc-700'
+              ? 'bg-white border-slate-900 shadow-xs ring-1 ring-slate-900'
+              : 'bg-white border-slate-200 hover:border-slate-300'
           }`}
         >
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-semibold text-amber-400">Dilindungi (Whitelist)</span>
-            <Shield className="w-4 h-4 text-amber-400" />
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-xs font-medium text-slate-600">Dilindungi (Whitelist)</span>
+            <Shield className="w-4 h-4 text-amber-500" />
           </div>
-          <div className="text-2xl font-bold text-white tracking-tight">{whitelist.size}</div>
-          <p className="text-[11px] text-zinc-400 mt-1">Akun favorit yang tidak akan di-unfollow</p>
+          <div className="text-2xl font-bold text-slate-900">{whitelist.size}</div>
+          <p className="text-[11px] text-slate-500 mt-1">Akun yang dikecualikan</p>
         </button>
       </div>
 
-      {/* Filter & Controls Bar */}
-      <div className="bg-zinc-900/60 border border-zinc-800 rounded-2xl p-4 space-y-4">
-        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
-          {/* Search Box */}
+      {/* Control Bar */}
+      <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-3.5 shadow-xs">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          {/* Search */}
           <div className="relative flex-1">
-            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500" />
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
               type="text"
-              placeholder="Cari username..."
+              placeholder="Cari nama akun (@username)..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-zinc-950 border border-zinc-800 rounded-xl pl-10 pr-4 py-2.5 text-xs text-zinc-200 placeholder:text-zinc-500 focus:outline-none focus:border-rose-500"
+              className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-slate-900"
             />
           </div>
 
-          {/* Sort Dropdown */}
+          {/* Sort & Export */}
           <div className="flex items-center gap-2">
-            <div className="relative">
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
-                className="bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2.5 text-xs text-zinc-300 focus:outline-none focus:border-rose-500 cursor-pointer"
-              >
-                <option value="date-desc">Tanggal Follow (Terbaru)</option>
-                <option value="date-asc">Tanggal Follow (Terlama)</option>
-                <option value="alpha-asc">Username (A - Z)</option>
-                <option value="alpha-desc">Username (Z - A)</option>
-              </select>
-            </div>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as any)}
+              className="bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-2 text-xs text-slate-700 focus:outline-none focus:border-slate-900 cursor-pointer"
+            >
+              <option value="date-desc">Tanggal Follow (Terbaru)</option>
+              <option value="date-asc">Tanggal Follow (Terlama)</option>
+              <option value="alpha-asc">Abjad (A - Z)</option>
+              <option value="alpha-desc">Abjad (Z - A)</option>
+            </select>
 
             <button
               onClick={handleExportCsv}
-              className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-medium transition-colors"
-              title="Download Data sebagai CSV"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium transition-colors cursor-pointer"
             >
-              <Download className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Export CSV</span>
+              <Download className="w-3.5 h-3.5 text-slate-600" />
+              <span>Export CSV</span>
             </button>
           </div>
         </div>
 
-        {/* Action & Batch Selectors */}
+        {/* Batch selection toolbar for Not Following Back */}
         {activeTab === 'notFollowingBack' && (
-          <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-zinc-800/80 text-xs">
-            <div className="flex items-center gap-2">
-              <label className="flex items-center gap-2 text-zinc-300 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  checked={hideWhitelisted}
-                  onChange={(e) => setHideWhitelisted(e.target.checked)}
-                  className="rounded border-zinc-700 text-rose-500 focus:ring-0 bg-zinc-950"
-                />
-                <span className="text-[11px] text-zinc-400">Sembunyikan Akun Whitelist / Dilindungi</span>
-              </label>
-            </div>
+          <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-slate-100 text-xs">
+            <label className="flex items-center gap-2 text-slate-600 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={hideWhitelisted}
+                onChange={(e) => setHideWhitelisted(e.target.checked)}
+                className="rounded border-slate-300 text-slate-900 focus:ring-0"
+              />
+              <span className="text-xs">Sembunyikan akun yang dilindungi (whitelist)</span>
+            </label>
 
-            {/* Quick Batch Select Buttons */}
             <div className="flex items-center gap-1.5">
-              <span className="text-[11px] text-zinc-500 mr-1">Pilih Cepat:</span>
+              <span className="text-[11px] text-slate-500 mr-1">Pilih Cepat:</span>
               <button
                 onClick={() => handleSelectQuick(10)}
-                className="px-2.5 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-medium transition-colors"
+                className="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium transition-colors cursor-pointer"
               >
                 10
               </button>
               <button
                 onClick={() => handleSelectQuick(25)}
-                className="px-2.5 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-medium transition-colors"
+                className="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium transition-colors cursor-pointer"
               >
                 25
               </button>
               <button
                 onClick={() => handleSelectQuick(50)}
-                className="px-2.5 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-medium transition-colors"
+                className="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium transition-colors cursor-pointer"
               >
                 50
               </button>
               <button
                 onClick={handleSelectAllVisible}
-                className="px-2.5 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-medium transition-colors"
+                className="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium transition-colors cursor-pointer"
               >
-                Pilih Semua ({Math.min(filteredList.length, pageSize)})
+                Semua Halaman Ini ({Math.min(filteredList.length, pageSize)})
               </button>
               {selectedUsernames.length > 0 && (
                 <button
                   onClick={handleClearSelection}
-                  className="px-2.5 py-1 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 font-medium transition-colors"
+                  className="px-2.5 py-1 rounded-md bg-red-50 hover:bg-red-100 text-red-600 text-xs font-medium transition-colors cursor-pointer"
                 >
                   Batal
                 </button>
@@ -362,28 +335,26 @@ export const UserTable: React.FC<UserTableProps> = ({
         )}
       </div>
 
-      {/* User List */}
-      <div className="bg-zinc-900/40 border border-zinc-800 rounded-2xl overflow-hidden">
-        <div className="p-4 border-b border-zinc-800 flex items-center justify-between text-xs text-zinc-400">
-          <div className="flex items-center gap-2">
-            <span>
-              Menampilkan <strong className="text-white">{visibleList.length}</strong> dari{' '}
-              <strong className="text-white">{filteredList.length}</strong> akun
-            </span>
-            {selectedUsernames.length > 0 && (
-              <span className="text-rose-400 font-semibold">
-                ({selectedUsernames.length} dipilih)
-              </span>
-            )}
+      {/* User Table Card */}
+      <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs">
+        <div className="px-4 py-3 border-b border-slate-200 flex items-center justify-between text-xs text-slate-500 bg-slate-50/50">
+          <div>
+            Menampilkan <strong className="text-slate-800">{visibleList.length}</strong> dari{' '}
+            <strong className="text-slate-800">{filteredList.length}</strong> akun
           </div>
+          {selectedUsernames.length > 0 && (
+            <div className="font-semibold text-slate-900 bg-slate-100 px-2 py-0.5 rounded">
+              {selectedUsernames.length} akun dipilih
+            </div>
+          )}
         </div>
 
         {filteredList.length === 0 ? (
-          <div className="py-16 text-center text-zinc-500">
-            <p className="text-sm">Tidak ada akun yang sesuai dengan kriteria.</p>
+          <div className="py-12 text-center text-slate-400 text-xs">
+            Tidak ada akun yang sesuai dengan filter pencarian.
           </div>
         ) : (
-          <div className="divide-y divide-zinc-800/60">
+          <div className="divide-y divide-slate-100">
             {visibleList.map((user) => {
               const isSelected = selectedUsernames.includes(user.username);
               const isWhitelisted = whitelist.has(user.username);
@@ -391,10 +362,8 @@ export const UserTable: React.FC<UserTableProps> = ({
               return (
                 <div
                   key={user.username}
-                  className={`flex items-center justify-between p-3.5 sm:p-4 transition-colors ${
-                    isSelected
-                      ? 'bg-rose-500/10'
-                      : 'hover:bg-zinc-800/30'
+                  className={`flex items-center justify-between px-4 py-3 transition-colors ${
+                    isSelected ? 'bg-slate-50' : 'hover:bg-slate-50/60'
                   }`}
                 >
                   {/* Left: Checkbox, Avatar, Info */}
@@ -403,85 +372,78 @@ export const UserTable: React.FC<UserTableProps> = ({
                       <button
                         onClick={() => handleToggleSelect(user.username)}
                         disabled={isWhitelisted}
-                        className={`text-zinc-400 hover:text-white transition-colors ${
+                        className={`text-slate-400 hover:text-slate-700 transition-colors cursor-pointer ${
                           isWhitelisted ? 'opacity-30 cursor-not-allowed' : ''
                         }`}
                       >
                         {isSelected ? (
-                          <CheckSquare className="w-5 h-5 text-rose-500" />
+                          <CheckSquare className="w-4 h-4 text-slate-900" />
                         ) : (
-                          <Square className="w-5 h-5" />
+                          <Square className="w-4 h-4" />
                         )}
                       </button>
                     )}
 
-                    <div
-                      className={`w-9 h-9 rounded-full bg-gradient-to-tr ${getAvatarGradient(
-                        user.username
-                      )} flex items-center justify-center text-white font-bold text-xs uppercase shadow-sm shrink-0`}
-                    >
-                      {user.username.slice(0, 2)}
+                    <div className="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700 font-semibold text-xs shrink-0">
+                      {user.username.slice(0, 2).toUpperCase()}
                     </div>
 
                     <div className="min-w-0">
-                      <div className="flex items-center gap-1.5 flex-wrap">
+                      <div className="flex items-center gap-1.5">
                         <a
                           href={user.url}
                           target="_blank"
                           rel="noreferrer"
-                          className="font-semibold text-xs sm:text-sm text-zinc-100 hover:text-rose-400 transition-colors truncate"
+                          className="font-medium text-xs sm:text-sm text-slate-900 hover:underline truncate"
                         >
                           @{user.username}
                         </a>
 
                         {isWhitelisted && (
-                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center gap-1">
-                            <Star className="w-2.5 h-2.5 fill-amber-400" />
+                          <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200 flex items-center gap-1">
+                            <Star className="w-2.5 h-2.5 fill-amber-500 text-amber-500" />
                             <span>Dilindungi</span>
                           </span>
                         )}
                       </div>
 
                       {user.followedAtFormatted && (
-                        <p className="text-[11px] text-zinc-500">
-                          Di-follow: {user.followedAtFormatted}
+                        <p className="text-[11px] text-slate-400">
+                          Di-follow sejak: {user.followedAtFormatted}
                         </p>
                       )}
                     </div>
                   </div>
 
                   {/* Right Actions */}
-                  <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-                    {/* Whitelist Star Button */}
+                  <div className="flex items-center gap-1 shrink-0">
                     <button
                       onClick={() => toggleWhitelist(user.username)}
-                      title={isWhitelisted ? 'Hapus dari Whitelist' : 'Lindungi dari Unfollow (Whitelist)'}
-                      className={`p-2 rounded-lg transition-colors ${
+                      title={isWhitelisted ? 'Hapus dari proteksi' : 'Lindungi akun agar tidak di-unfollow'}
+                      className={`p-1.5 rounded-md transition-colors cursor-pointer ${
                         isWhitelisted
-                          ? 'bg-amber-500/20 text-amber-400'
-                          : 'text-zinc-500 hover:text-amber-400 hover:bg-zinc-800'
+                          ? 'text-amber-500 bg-amber-50 hover:bg-amber-100'
+                          : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'
                       }`}
                     >
-                      <Star className={`w-4 h-4 ${isWhitelisted ? 'fill-amber-400' : ''}`} />
+                      <Star className={`w-4 h-4 ${isWhitelisted ? 'fill-amber-500' : ''}`} />
                     </button>
 
-                    {/* Open in Instagram Button */}
                     <a
                       href={user.url}
                       target="_blank"
                       rel="noreferrer"
-                      title="Buka Profil di Instagram"
-                      className="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
+                      title="Buka profil di tab baru"
+                      className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-md transition-colors"
                     >
                       <ExternalLink className="w-4 h-4" />
                     </a>
 
-                    {/* Quick Mark Unfollowed */}
                     {activeTab === 'notFollowingBack' && (
                       <button
                         onClick={() => markAsUnfollowed(user.username)}
-                        title="Tandai Sudah Di-unfollow"
-                        className="px-2.5 py-1.5 rounded-lg bg-zinc-800/80 hover:bg-emerald-500/20 hover:text-emerald-400 text-zinc-400 text-xs font-medium transition-colors"
+                        title="Tandai sudah selesai di-unfollow"
+                        className="px-2 py-1 text-[11px] font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-md transition-colors cursor-pointer"
                       >
                         <Check className="w-3.5 h-3.5" />
                       </button>
@@ -493,14 +455,13 @@ export const UserTable: React.FC<UserTableProps> = ({
           </div>
         )}
 
-        {/* Load More Button */}
         {pageSize < filteredList.length && (
-          <div className="p-4 border-t border-zinc-800 text-center">
+          <div className="p-3 border-t border-slate-100 text-center bg-slate-50/50">
             <button
               onClick={() => setPageSize((prev) => prev + 50)}
-              className="px-4 py-2 text-xs font-semibold text-zinc-300 hover:text-white bg-zinc-800 hover:bg-zinc-700 rounded-xl transition-colors"
+              className="px-3.5 py-1.5 text-xs font-medium text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg transition-colors cursor-pointer shadow-xs"
             >
-              Muat 50 Akun Lagi ({filteredList.length - pageSize} tersisa)
+              Tampilkan 50 Akun Lagi ({filteredList.length - pageSize} tersisa)
             </button>
           </div>
         )}
@@ -508,4 +469,3 @@ export const UserTable: React.FC<UserTableProps> = ({
     </div>
   );
 };
-

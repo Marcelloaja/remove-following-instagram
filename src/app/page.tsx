@@ -9,7 +9,7 @@ import { AutoUnfollowModal } from '@/components/AutoUnfollowModal';
 import { InstagramGuideModal } from '@/components/InstagramGuideModal';
 import { BatchActionBar } from '@/components/BatchActionBar';
 import { ParseResult } from '@/types/instagram';
-import { ShieldCheck, Zap, Heart, CheckCircle2, AlertCircle } from 'lucide-react';
+import { ShieldCheck, CheckCircle2, Clock, Star } from 'lucide-react';
 
 export default function Home() {
   const [data, setData] = useState<ParseResult | null>(null);
@@ -26,7 +26,7 @@ export default function Home() {
   const handleParsed = (result: ParseResult) => {
     setData(result);
     setSelectedUsernames([]);
-    showToast(`Berhasil memuat ${result.following.length} following & ${result.followers.length} followers!`);
+    showToast(`Berhasil memuat ${result.following.length} following & ${result.followers.length} followers`);
   };
 
   const handleReset = () => {
@@ -44,7 +44,7 @@ export default function Home() {
 
   const handleCopySelected = () => {
     navigator.clipboard.writeText(selectedUsernames.join('\n'));
-    showToast(`${selectedUsernames.length} username berhasil disalin!`);
+    showToast(`${selectedUsernames.length} username berhasil disalin ke clipboard!`);
   };
 
   const handleSelectQuick = (count: number) => {
@@ -58,12 +58,12 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-zinc-950 text-zinc-100">
+    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900">
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed top-20 right-6 z-50 bg-zinc-900 border border-zinc-700 text-white px-4 py-2.5 rounded-xl shadow-2xl text-xs flex items-center gap-2 animate-in fade-in slide-in-from-top-2">
-          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-          <span>{toastMessage}</span>
+        <div className="fixed top-20 right-6 z-50 bg-white border border-slate-200 text-slate-900 px-4 py-2.5 rounded-xl shadow-lg text-xs flex items-center gap-2 animate-in fade-in slide-in-from-top-2">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+          <span className="font-medium">{toastMessage}</span>
         </div>
       )}
 
@@ -74,69 +74,68 @@ export default function Home() {
         hasData={Boolean(data)}
       />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+      <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-8">
         {!data ? (
           /* Empty State / Upload Mode */
-          <div className="space-y-8 animate-in fade-in duration-300">
-            {/* Hero Banner */}
-            <div className="text-center max-w-2xl mx-auto pt-4 pb-2">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-semibold mb-4">
-                <Zap className="w-3.5 h-3.5" />
-                <span>Solusi Cerdas & Aman Bersihkan Following Instagram</span>
-              </div>
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-tight">
-                Cek Siapa yang <span className="bg-gradient-to-r from-amber-400 via-rose-500 to-purple-500 bg-clip-text text-transparent">Tidak Follback</span> Kamu
+          <div className="space-y-6">
+            {/* Clean Hero Title */}
+            <div className="text-center max-w-xl mx-auto pt-4 pb-2">
+              <span className="inline-block text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-200/70 text-slate-700 mb-3">
+                Instagram Following Manager
+              </span>
+              <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+                Cek Akun yang Tidak Follback
               </h1>
-              <p className="mt-4 text-zinc-400 text-sm sm:text-base leading-relaxed">
-                Temukan akun yang tidak mengikuti balik dengan 100% akurat. Pilih akun yang ingin dihapus, lalu gunakan fitur <strong>Smart Auto-Unfollow</strong> ber-jeda aman langsung dari browser Anda tanpa risiko kena ban!
+              <p className="mt-2 text-slate-600 text-xs sm:text-sm leading-relaxed">
+                Bandingkan daftar pengikut dan yang Anda ikuti secara aman dari file ekspor resmi Meta tanpa perlu memasukkan password akun.
               </p>
             </div>
 
-            {/* Privacy Shield Info */}
+            {/* Privacy Guarantee Banner */}
             <PrivacyBanner />
 
-            {/* Drag & Drop File Uploader */}
+            {/* Upload Zone */}
             <FileUploader
               onParsed={handleParsed}
               onOpenGuide={() => setIsGuideOpen(true)}
             />
 
-            {/* Feature Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-6 border-t border-zinc-800/80">
-              <div className="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800">
-                <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center mb-3">
+            {/* Simple Clean Functional Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-6 border-t border-slate-200">
+              <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-xs">
+                <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-700 mb-2.5">
                   <ShieldCheck className="w-4 h-4" />
                 </div>
-                <h4 className="font-semibold text-white text-sm">Privasi & Anti Phishing</h4>
-                <p className="text-xs text-zinc-400 mt-1 leading-relaxed">
-                  Tidak pernah ada form login password Instagram. Data diekstrak langsung di perangkat Anda tanpa lewat server kami.
+                <h4 className="font-semibold text-xs text-slate-900">Tanpa Password</h4>
+                <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
+                  Tidak ada risiko akun terkena checkpoint atau banned karena data diproses langsung di browser Anda.
                 </p>
               </div>
 
-              <div className="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800">
-                <div className="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-400 flex items-center justify-center mb-3">
-                  <Zap className="w-4 h-4" />
+              <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-xs">
+                <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-700 mb-2.5">
+                  <Clock className="w-4 h-4" />
                 </div>
-                <h4 className="font-semibold text-white text-sm">Auto-Unfollow Berjeda</h4>
-                <p className="text-xs text-zinc-400 mt-1 leading-relaxed">
-                  Gunakan bookmarklet atau script otomatis yang dilengkapi jeda acak (8-15 detik) untuk menghindari peringatan spam dari Instagram.
+                <h4 className="font-semibold text-xs text-slate-900">Jeda Otomatis Aman</h4>
+                <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
+                  Fitur unfollow dilengkapi jeda acak (8–15 detik) untuk menghindari deteksi spam dan batasan HTTP 429.
                 </p>
               </div>
 
-              <div className="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800">
-                <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center mb-3">
-                  <Heart className="w-4 h-4" />
+              <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-xs">
+                <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-700 mb-2.5">
+                  <Star className="w-4 h-4" />
                 </div>
-                <h4 className="font-semibold text-white text-sm">Proteksi Whitelist</h4>
-                <p className="text-xs text-zinc-400 mt-1 leading-relaxed">
-                  Tandai akun artis, teman dekat, atau idola Anda sebagai Whitelist agar terlindungi dan tidak akan ikut ter-unfollow.
+                <h4 className="font-semibold text-xs text-slate-900">Proteksi Whitelist</h4>
+                <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
+                  Tandai akun artis, keluarga, atau teman dekat agar terlindungi dan tidak sengaja terhapus.
                 </p>
               </div>
             </div>
           </div>
         ) : (
           /* Data Dashboard Mode */
-          <div className="space-y-6 animate-in fade-in duration-300">
+          <div className="space-y-6">
             <UserTable
               data={data}
               onOpenAutoUnfollow={handleOpenAutoUnfollow}
@@ -144,7 +143,7 @@ export default function Home() {
               setSelectedUsernames={setSelectedUsernames}
             />
 
-            {/* Bottom Floating Action Bar */}
+            {/* Floating Action Bar */}
             <BatchActionBar
               selectedCount={selectedUsernames.length}
               totalVisible={data.notFollowingBack.length}
@@ -157,7 +156,7 @@ export default function Home() {
         )}
       </main>
 
-      {/* Auto Unfollow Modal */}
+      {/* Modals */}
       <AutoUnfollowModal
         isOpen={isAutoUnfollowOpen}
         onClose={() => setIsAutoUnfollowOpen(false)}
@@ -165,16 +164,15 @@ export default function Home() {
         onMarkUnfollowed={handleMarkUnfollowed}
       />
 
-      {/* Official Guide Modal */}
       <InstagramGuideModal
         isOpen={isGuideOpen}
         onClose={() => setIsGuideOpen(false)}
       />
 
-      {/* Footer */}
-      <footer className="border-t border-zinc-800 bg-zinc-950 py-6 text-center text-xs text-zinc-500">
+      {/* Clean Footer */}
+      <footer className="border-t border-slate-200 bg-white py-6 text-center text-xs text-slate-400">
         <p>
-          Dibuat dengan privasi nomor satu. Tidak berafiliasi dengan Instagram atau Meta Platforms, Inc.
+          Alat bantu mandiri untuk pengelolaan following Instagram. Tidak berafiliasi dengan Instagram atau Meta.
         </p>
       </footer>
     </div>

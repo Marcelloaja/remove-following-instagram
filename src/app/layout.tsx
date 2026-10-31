@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Instagram Unfollower Tracker & Cleaner - Aman & Private',
+  title: 'IG Cleaner — Cek & Bersihkan Following Tanpa Login',
   description:
-    'Cek siapa yang Anda follow tapi tidak follback di Instagram. Bersihkan following dengan aman, tanpa password, dan 100% menjaga privasi.',
+    'Alat praktis untuk mengecek akun Instagram yang tidak follow balik (follback) dan membersihkan following secara aman.',
 };
 
 export default function RootLayout({
@@ -26,9 +26,9 @@ export default function RootLayout({
   return (
     <html
       lang="id"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-zinc-950 text-zinc-100 selection:bg-rose-500/30 selection:text-rose-200">
+      <body className="min-h-full flex flex-col bg-slate-50 text-slate-900 selection:bg-slate-900 selection:text-white">
         {children}
       </body>
     </html>
