@@ -1,24 +1,27 @@
 # UnfollIG — Instagram Non-Follower Tracker & Safe Cleaner
 
-Aplikasi web modern berbasis **Next.js (App Router)** dan **Tailwind CSS** untuk melihat akun Instagram yang Anda ikuti tetapi **tidak follback** Anda, serta membantu membersihkan (unfollow) secara bertahap atau sekaligus dengan menjaga keamanan akun dan privasi 100%.
+![Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js)
+![TailwindCSS](https://img.shields.io/badge/Tailwind-CSS-38B2AC?style=for-the-badge&logo=tailwind-css)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript)
+![Deploy with Vercel](https://img.shields.io/badge/Vercel-Deployed-black?style=for-the-badge&logo=vercel)
 
-Didesain khusus untuk langsung di-deploy ke **Vercel**.
+Aplikasi web modern untuk melihat akun Instagram yang Anda ikuti tetapi **tidak follback** Anda, serta membantu membersihkan (unfollow) akun secara bertahap atau sekaligus dengan menjaga privasi 100% dan keamanan akun tanpa risiko kena ban.
 
 ---
 
 ## 🛡️ Mengapa Aplikasi Ini 100% Aman & Menjaga Privasi?
 
 1. **Tanpa Form Login / Password Instagram:**
-   - Memasukkan password Instagram di website pihak ketiga sangat berbahaya dan melanggar Terms of Service Meta.
-   - Serverless Vercel menggunakan IP cloud data center (AWS), sehingga jika login diproses dari server, Instagram akan langsung memicu *Checkpoint/Suspicious Login Attempt* atau bahkan **banned permanen**.
-   - **Solusi kami:** Data diproses **100% di browser Anda (Client-Side)** menggunakan file ekspor data resmi dari Meta. Tidak ada data yang dikirim ke server.
+   - Memasukkan password Instagram di website pihak ketiga sangat berbahaya dan melanggar aturan Meta.
+   - Serverless Vercel menggunakan IP cloud data center (AWS), sehingga jika login diproses dari server luar, Instagram akan langsung memicu *Checkpoint / Suspicious Login Attempt* atau bahkan **banned permanen**.
+   - **Solusi Kami:** Data diproses **100% di browser lokal Anda (Client-Side)** menggunakan file ekspor resmi dari Meta. Tidak ada data yang dikirim ke server mana pun.
 
 2. **Smart In-Browser Auto-Unfollower (Anti-Spam & Anti-Ban):**
-   - Dijalankan di tab browser Anda sendiri di mana Anda sudah login ke `instagram.com` menggunakan IP asli rumah/HP Anda.
-   - Dilengkapi **jeda keamanan acak (8 - 15 detik)** dan tombol jeda/hentikan otomatis agar aktivitas unfollow Anda terlihat wajar dan tidak terdeteksi sebagai bot oleh sistem proteksi Instagram.
+   - Dijalankan di tab browser Anda sendiri di mana Anda sudah login ke `instagram.com` menggunakan alamat IP asli Anda.
+   - Dilengkapi **jeda keamanan acak (8 - 15 detik)**, countdown timer, serta tombol jeda (pause) & hentikan (stop) agar aktivitas unfollow Anda terlihat wajar dan tidak terdeteksi sebagai bot.
 
-3. **Fitur Whitelist / Proteksi Akun:**
-   - Anda bisa menandai akun keluarga, sahabat, atau artis favorit dengan ikon bintang agar tidak akan pernah ikut ter-unfollow saat proses pembersihan massal.
+3. **Fitur Whitelist / Proteksi Akun Favorit:**
+   - Anda bisa menandai akun keluarga, sahabat, atau artis idola dengan ikon bintang ⭐ agar terlindungi dan tidak akan pernah ikut ter-unfollow saat proses pembersihan.
 
 ---
 
@@ -30,12 +33,12 @@ Didesain khusus untuk langsung di-deploy ke **Vercel**.
   - *Fans* (Orang yang follow Anda, tapi Anda belum follow balik).
   - *Mutuals* (Teman yang saling follow).
   - *Whitelist* (Akun yang sengaja dilindungi).
-- 🔍 **Pencarian & Urutan:** Cari berdasarkan `@username` dan urutkan berdasarkan tanggal follow (terbaru/terlama) atau abjad.
-- 📦 **Pilihan Fleksibel:** Pilih satuan, pilih 10, 25, 50 akun sekaligus, atau semua.
-- 🤖 **3 Metode Unfollow:**
-  1. **Bookmarklet:** Cukup seret tombol ke Bilah Bookmark browser Anda, buka tab Instagram, lalu klik bookmark tersebut.
-  2. **Console Script (F12):** Copy script dan jalankan di tab Console Instagram.
-  3. **Fast-Click:** Buka profil berurutan untuk unfollow manual dalam 1-klik.
+- 🔍 **Pencarian & Urutan:** Cari berdasarkan `@username` dan urutkan berdasarkan tanggal follow (terbaru/terlama) atau abjad A-Z.
+- 📦 **Pilihan Fleksibel:** Pilih satuan dengan checkbox, pilih 10, 25, 50 akun sekaligus, atau pilih semua.
+- 🤖 **3 Metode Unfollow Praktis:**
+  1. **Bookmarklet:** Seret tombol ke Bilah Bookmark browser Anda, buka tab Instagram, lalu klik bookmark tersebut.
+  2. **Console Script (F12):** Salin script dan jalankan di tab Console Instagram.
+  3. **Fast-Click:** Buka profil berurutan untuk unfollow manual dalam 1-klik tanpa repot mengetik username.
 - 📊 **Export Data:** Download daftar akun dalam format `.csv` kapan saja.
 
 ---
@@ -43,10 +46,14 @@ Didesain khusus untuk langsung di-deploy ke **Vercel**.
 ## 🛠️ Cara Menjalankan Secara Lokal
 
 ```bash
-# 1. Masuk ke folder proyek
+# 1. Clone repositori ini
+git clone https://github.com/Marcelloaja/remove-following-instagram.git
 cd remove-following-instagram
 
-# 2. Jalankan server lokal
+# 2. Instal dependensi
+npm install
+
+# 3. Jalankan server lokal
 npm run dev
 ```
 
@@ -54,31 +61,16 @@ Buka [http://localhost:3000](http://localhost:3000) di browser Anda.
 
 ---
 
-## ☁️ Cara Push & Deploy ke Vercel
+## ☁️ Cara Deploy ke Vercel
 
-### Metode 1: Menggunakan GitHub & Vercel Dashboard (Paling Populer)
-1. Buat repository baru di GitHub (misal: `remove-following-instagram`).
-2. Jalankan perintah berikut di terminal:
-   ```bash
-   git add .
-   git commit -m "feat: initial commit instagram unfollower app"
-   git branch -M main
-   git remote add origin https://github.com/<username-kamu>/remove-following-instagram.git
-   git push -u origin main
-   ```
-3. Buka [vercel.com](https://vercel.com) & login.
-4. Klik **"Add New..."** &rarr; **"Project"** &rarr; Pilih repository GitHub Anda.
-5. Klik **"Deploy"**. Vercel akan langsung meng-compile dan website Anda langsung online dalam hitungan detik!
-
-### Metode 2: Menggunakan Vercel CLI
-```bash
-npm i -g vercel
-vercel
-```
+1. Buka [vercel.com](https://vercel.com) dan login dengan akun GitHub Anda.
+2. Klik tombol **"Add New..."** &rarr; **"Project"**.
+3. Pilih repository **`Marcelloaja/remove-following-instagram`**.
+4. Klik **"Deploy"**. Vercel akan otomatis melakukan proses build dan website Anda langsung online dalam hitungan detik!
 
 ---
 
-## 📖 Cara Mendapatkan File Data Instagram (1-3 Menit)
+## 📖 Cara Mendapatkan File Data Instagram Resmi (1-3 Menit)
 
 1. Buka [accountscenter.instagram.com/info_and_permissions/dyi/](https://accountscenter.instagram.com/info_and_permissions/dyi/)
 2. Klik **"Unduh atau transfer informasi"** &rarr; Pilih akun Instagram Anda.
@@ -87,5 +79,15 @@ vercel
 5. Pada pengaturan format, pilih:
    - Format: **JSON**
    - Rentang Tanggal: **Sepanjang Waktu (All time)**
-6. Klik **"Buat file"**. Dalam 1-3 menit, Meta akan mengirimkan link unduh file `.zip`.
+6. Klik **"Buat file"**. Dalam 1-3 menit, Meta akan mengirimkan notifikasi file unduhan `.zip`.
 7. Unggah file `.zip` tersebut langsung ke aplikasi web ini!
+
+---
+
+## ❓ FAQ & Troubleshooting
+
+#### Q: Di tab Console Instagram muncul tulisan merah besar "Stop!", apakah aman?
+**A:** Sangat aman! Tulisan merah "Stop!" itu adalah pesan perlindungan bawaan resmi dari Meta (*Self-XSS Protection*) yang selalu muncul kepada siapa saja yang membuka menu F12 di situs Instagram/Facebook.
+
+#### Q: Browser Chrome tidak mengizinkan paste script di Console?
+**A:** Di Chrome/Edge terbaru, ketik kata `allow pasting` di console lalu tekan **Enter**. Setelah itu, tekan `Ctrl + V` untuk menempelkan script dan tekan **Enter** lagi.
