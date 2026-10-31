@@ -65,6 +65,16 @@ export const AutoUnfollowModal: React.FC<AutoUnfollowModalProps> = ({
 
         {/* Modal Body */}
         <div className="p-6 overflow-y-auto space-y-6 text-sm">
+          {/* Large Batch Warning */}
+          {selectedUsernames.length > 50 && (
+            <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-start gap-2.5">
+              <ShieldAlert className="w-5 h-5 mt-0.5 shrink-0 text-rose-400" />
+              <div>
+                <strong>Peringatan Batch Besar ({selectedUsernames.length} Akun):</strong> Instagram memiliki sistem anti-spam yang ketat dan akan membatasi request (error 429 Too Many Requests) jika memproses lebih dari 50–100 akun sekaligus dalam satu sesi. Sangat disarankan unfollow bertahap (gunakan tombol <strong>Pilih 25</strong> atau <strong>Pilih 50</strong>) dengan jeda 1–2 jam per sesi agar terhindar dari limit!
+              </div>
+            </div>
+          )}
+
           {/* Safety Delay Slider */}
           <div className="p-4 rounded-xl bg-zinc-950/80 border border-zinc-800 space-y-3">
             <div className="flex items-center justify-between">

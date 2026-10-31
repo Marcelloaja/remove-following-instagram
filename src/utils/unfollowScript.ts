@@ -20,7 +20,7 @@ export function generateUnfollowScript(
   // Create UI Widget
   const widget = document.createElement('div');
   widget.id = 'ig-unfollower-widget';
-  widget.style.cssText = 'position:fixed;bottom:24px;right:24px;width:360px;background:#18181b;color:#f4f4f5;border-radius:16px;box-shadow:0 20px 25px -5px rgba(0,0,0,0.5), 0 8px 10px -6px rgba(0,0,0,0.5);border:1px solid #27272a;z-index:9999999;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding:18px;font-size:14px;';
+  widget.style.cssText = 'position:fixed;bottom:24px;right:24px;width:380px;background:#18181b;color:#f4f4f5;border-radius:16px;box-shadow:0 20px 25px -5px rgba(0,0,0,0.6), 0 8px 10px -6px rgba(0,0,0,0.5);border:1px solid #27272a;z-index:9999999;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding:18px;font-size:14px;';
   
   widget.innerHTML = \`
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
@@ -41,13 +41,16 @@ export function generateUnfollowScript(
       </div>
     </div>
 
-    <div id="ig-status-box" style="font-size:12px;color:#94a3b8;margin-bottom:12px;line-height:1.4;min-height:38px;background:#09090b;padding:8px;border-radius:6px;border:1px solid #1f2937;">
+    <div id="ig-status-box" style="font-size:12px;color:#94a3b8;margin-bottom:12px;line-height:1.4;min-height:48px;background:#09090b;padding:10px;border-radius:8px;border:1px solid #1f2937;">
       Menyiapkan proses unfollow untuk \${targets.length} akun...
     </div>
 
     <div style="display:flex;gap:8px;">
       <button id="ig-btn-pause" style="flex:1;background:#27272a;color:#f4f4f5;border:1px solid #3f3f46;border-radius:8px;padding:8px 12px;font-weight:600;font-size:13px;cursor:pointer;">Jeda</button>
       <button id="ig-btn-stop" style="flex:1;background:#dc2626;color:#ffffff;border:none;border-radius:8px;padding:8px 12px;font-weight:600;font-size:13px;cursor:pointer;">Hentikan</button>
+    </div>
+    <div id="ig-rate-warning" style="display:none;margin-top:10px;padding:8px;border-radius:6px;background:#450a0a;border:1px solid #991b1b;color:#fca5a5;font-size:11px;line-height:1.3;">
+      🛑 <strong>Terkena Limit Instagram (HTTP 429)</strong>: Instagram membatasi aksi sementara. Script otomatis dijeda. Istirahat 30-60 menit sebelum melanjutkan agar akun tetap aman!
     </div>
     <div style="margin-top:10px;font-size:11px;color:#71717a;text-align:center;">
       🛡️ Jeda keamanan aktif untuk mencegah akun terblokir.
@@ -63,6 +66,7 @@ export function generateUnfollowScript(
   const btnPause = document.getElementById('ig-btn-pause');
   const btnStop = document.getElementById('ig-btn-stop');
   const btnClose = document.getElementById('ig-btn-close');
+  const rateWarning = document.getElementById('ig-rate-warning');
 
   let isPaused = false;
   let isStopped = false;
@@ -80,6 +84,7 @@ export function generateUnfollowScript(
     isPaused = !isPaused;
     btnPause.innerText = isPaused ? 'Lanjutkan' : 'Jeda';
     if (!isPaused) {
+      rateWarning.style.display = 'none';
       statusBox.innerHTML = 'Melanjutkan proses...';
     } else {
       statusBox.innerHTML = '<span style="color:#f59e0b;">Dijeda sementara. Klik Lanjutkan kapan saja.</span>';
@@ -109,11 +114,14 @@ export function generateUnfollowScript(
           'x-requested-with': 'XMLHttpRequest'
         }
       });
-      if (!res.ok) return null;
+      if (res.status === 429) {
+        return { isRateLimited: true, id: null };
+      }
+      if (!res.ok) return { isRateLimited: false, id: null };
       const data = await res.json();
-      return data?.data?.user?.id || null;
+      return { isRateLimited: false, id: data?.data?.user?.id || null };
     } catch (e) {
-      return null;
+      return { isRateLimited: false, id: null };
     }
   }
 
@@ -129,9 +137,12 @@ export function generateUnfollowScript(
           'content-type': 'application/x-www-form-urlencoded'
         }
       });
-      return res.ok;
+      if (res.status === 429) {
+        return { success: false, isRateLimited: true };
+      }
+      return { success: res.ok, isRateLimited: false };
     } catch (e) {
-      return false;
+      return { success: false, isRateLimited: false };
     }
   }
 
@@ -173,17 +184,42 @@ export function generateUnfollowScript(
       bar.style.width = \`\${(currentIndex / targets.length) * 100}%\`;
       statusBox.innerHTML = \`Mencari data akun: <strong style="color:#f43f5e;">@\${target}</strong>...\`;
 
-      const userId = await getUserId(target);
+      const result = await getUserId(target);
+
+      if (result.isRateLimited) {
+        // Automatically PAUSE when rate limited to save account
+        isPaused = true;
+        btnPause.innerText = 'Lanjutkan';
+        rateWarning.style.display = 'block';
+        statusBox.innerHTML = '<span style="color:#ef4444;">🛑 Terkena limit sementara (HTTP 429). Script otomatis dijeda untuk melindungi akun Anda. Istirahatlah 30-60 menit.</span>';
+        timerText.innerText = 'Dijeda (Limit)';
+        // Decrement i so that after resume we retry this target
+        i--;
+        continue;
+      }
+
+      const userId = result.id;
       if (!userId) {
         statusBox.innerHTML = \`⚠️ Gagal menemukan ID @\${target} (mungkin akun sudah dihapus/ganti nama). Melewati...\`;
       } else {
         statusBox.innerHTML = \`Mengirim permintaan unfollow untuk <strong style="color:#f43f5e;">@\${target}</strong>...\`;
-        const success = await unfollowUserId(userId);
-        if (success) {
+        const unfollResult = await unfollowUserId(userId);
+
+        if (unfollResult.isRateLimited) {
+          isPaused = true;
+          btnPause.innerText = 'Lanjutkan';
+          rateWarning.style.display = 'block';
+          statusBox.innerHTML = '<span style="color:#ef4444;">🛑 Terkena limit sementara unfollow (HTTP 429). Script otomatis dijeda untuk melindungi akun.</span>';
+          timerText.innerText = 'Dijeda (Limit)';
+          i--;
+          continue;
+        }
+
+        if (unfollResult.success) {
           successCount++;
           statusBox.innerHTML = \`✅ Berhasil unfollow <strong style="color:#10b981;">@\${target}</strong>!\`;
         } else {
-          statusBox.innerHTML = \`⚠️ Gagal unfollow @\${target}. Instagram mungkin membatasi aksi sementara. Istirahat sejenak disarankan.\`;
+          statusBox.innerHTML = \`⚠️ Gagal unfollow @\${target}. Instagram mungkin membatasi aksi sementara.\`;
         }
       }
 
@@ -195,7 +231,7 @@ export function generateUnfollowScript(
       }
     }
 
-    if (!isStopped) {
+    if (!isStopped && !isPaused) {
       statusBox.innerHTML = \`🎉 <strong>Selesai!</strong> Berhasil unfollow \${successCount} dari \${targets.length} akun.\`;
       timerText.innerText = 'Selesai';
       btnPause.style.display = 'none';
@@ -210,7 +246,5 @@ export function generateUnfollowScript(
 }
 
 export function generateBookmarkletUrl(script: string): string {
-  // Compress into bookmarklet URL
   return 'javascript:' + encodeURIComponent(script.replace(/\n\s+/g, ' '));
 }
-
