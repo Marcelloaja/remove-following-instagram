@@ -3,7 +3,7 @@
 import React, { useState, useRef } from 'react';
 import { Upload, FileArchive, FileCode, Sparkles, AlertCircle, HelpCircle, ArrowRight } from 'lucide-react';
 import { processZipFile, parseRawInstagramList, computeComparison } from '@/utils/instagramParser';
-import { ParseResult } from '@/types/instagram';
+import { ParseResult, InstagramUser } from '@/types/instagram';
 
 interface FileUploaderProps {
   onParsed: (result: ParseResult) => void;
@@ -41,23 +41,31 @@ export const FileUploader: React.FC<FileUploaderProps> = ({ onParsed, onOpenGuid
       }
 
       // Handle standalone JSON files
-      let followersData: unknown[] = [];
-      let followingData: unknown[] = [];
+      let followersData: InstagramUser[] = [];
+      let followingData: InstagramUser[] = [];
 
       for (const file of fileList) {
         const text = await file.text();
         const json = JSON.parse(text);
         const name = file.name.toLowerCase();
 
-        if (name.includes('follower')) {
-          followersData.push(...parseRawInstagramList(json));
-        } else if (name.includes('following')) {
+        const isFollowing =
+          (json && typeof json === 'object' && !Array.isArray(json) && 'relationships_following' in json) ||
+          (name.startsWith('following') && !name.includes('follower'));
+
+        const isFollowers =
+          name.startsWith('follower') || name.includes('followers');
+
+        if (isFollowing) {
           followingData.push(...parseRawInstagramList(json));
+        } else if (isFollowers) {
+          followersData.push(...parseRawInstagramList(json));
         } else {
-          // Attempt heuristic
-          const parsed = parseRawInstagramList(json);
-          if (parsed.length > 0) {
-            followingData.push(...parsed);
+          // Fallback heuristic
+          if (json && typeof json === 'object' && 'relationships_following' in json) {
+            followingData.push(...parseRawInstagramList(json));
+          } else {
+            followersData.push(...parseRawInstagramList(json));
           }
         }
       }
@@ -66,10 +74,15 @@ export const FileUploader: React.FC<FileUploaderProps> = ({ onParsed, onOpenGuid
         throw new Error('Format file tidak dikenali. Unggah file .zip resmi Meta atau file followers_1.json dan following.json.');
       }
 
-      const comparison = computeComparison(
-        followersData as ReturnType<typeof parseRawInstagramList>,
-        followingData as ReturnType<typeof parseRawInstagramList>
-      );
+      if (followersData.length === 0) {
+        throw new Error('File followers_1.json belum diunggah! Harap pilih kedua file (followers_1.json DAN following.json) agar sistem bisa membandingkan.');
+      }
+
+      if (followingData.length === 0) {
+        throw new Error('File following.json belum diunggah! Harap pilih kedua file (followers_1.json DAN following.json) agar sistem bisa membandingkan.');
+      }
+
+      const comparison = computeComparison(followersData, followingData);
       onParsed(comparison);
     } catch (err: unknown) {
       console.error(err);

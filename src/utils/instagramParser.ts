@@ -134,37 +134,50 @@ export async function processZipFile(file: File): Promise<{ followers: Instagram
   const followingUsers: InstagramUser[] = [];
 
   for (const relativePath of Object.keys(loadedZip.files)) {
-    const lowerPath = relativePath.toLowerCase();
+    // Ignore folders
+    if (loadedZip.files[relativePath].dir) continue;
 
-    // Check for followers file(s)
-    if (lowerPath.includes('follower') && !loadedZip.files[relativePath].dir) {
-      const content = await loadedZip.files[relativePath].async('string');
-      if (lowerPath.endsWith('.json')) {
-        try {
-          const json = JSON.parse(content);
-          const parsed = parseRawInstagramList(json);
-          followersUsers.push(...parsed);
-        } catch (e) {
-          console.warn('Gagal parse followers json:', relativePath, e);
-        }
-      } else if (lowerPath.endsWith('.html')) {
-        followersUsers.push(...parseHtmlContent(content));
-      }
+    // Get ONLY the file basename (e.g., "followers_1.json", "following.json")
+    const fileName = relativePath.split('/').pop()?.toLowerCase() || '';
+
+    // Ignore irrelevant relationship files
+    if (
+      fileName.includes('recently') ||
+      fileName.includes('pending') ||
+      fileName.includes('blocked') ||
+      fileName.includes('close_friends') ||
+      fileName.includes('removed') ||
+      fileName.includes('hide_story')
+    ) {
+      continue;
     }
 
-    // Check for following file
-    if (lowerPath.includes('following') && !loadedZip.files[relativePath].dir) {
-      const content = await loadedZip.files[relativePath].async('string');
-      if (lowerPath.endsWith('.json')) {
-        try {
-          const json = JSON.parse(content);
-          const parsed = parseRawInstagramList(json);
-          followingUsers.push(...parsed);
-        } catch (e) {
-          console.warn('Gagal parse following json:', relativePath, e);
+    // Determine type strictly based on filename (NOT directory path!)
+    const isFollowersFile = fileName.startsWith('follower') || fileName.includes('followers');
+    const isFollowingFile = fileName.startsWith('following') && !fileName.includes('follower');
+
+    if (fileName.endsWith('.json')) {
+      try {
+        const content = await loadedZip.files[relativePath].async('string');
+        const json = JSON.parse(content);
+
+        // Content heuristic backup
+        if (json && typeof json === 'object' && !Array.isArray(json) && 'relationships_following' in json) {
+          followingUsers.push(...parseRawInstagramList(json));
+        } else if (isFollowingFile) {
+          followingUsers.push(...parseRawInstagramList(json));
+        } else if (isFollowersFile) {
+          followersUsers.push(...parseRawInstagramList(json));
         }
-      } else if (lowerPath.endsWith('.html')) {
+      } catch (e) {
+        console.warn('Gagal parse JSON:', relativePath, e);
+      }
+    } else if (fileName.endsWith('.html')) {
+      const content = await loadedZip.files[relativePath].async('string');
+      if (isFollowingFile) {
         followingUsers.push(...parseHtmlContent(content));
+      } else if (isFollowersFile) {
+        followersUsers.push(...parseHtmlContent(content));
       }
     }
   }
@@ -204,4 +217,3 @@ export function computeComparison(followers: InstagramUser[], following: Instagr
     mutuals,
   };
 }
-
